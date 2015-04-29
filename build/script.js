@@ -27974,38 +27974,41 @@ angular.module("ui.utils", [ "ui.event", "ui.format", "ui.highlight", "ui.includ
     });
 })();
 angular.module("geo", []).service("geodata", function() {
-    return [ {
-        lon: -97.744044,
-        lat: 30.264294,
-        name: "JW Marriott Austin",
-        type: "lodging"
-    }, {
-        lon: -97.738831,
-        lat: 30.260244,
-        name: "Hotel Van Zandt",
-        type: "lodging"
-    }, {
-        lon: -97.740751,
-        lat: 30.266462,
-        name: "Westin Austin Downtown",
-        type: "lodging"
-    }, {
-        lon: -97.745056,
-        lat: 30.262144,
-        name: "Bat Fest",
-        type: "pitch",
-        description: "Celebrate this batty event as the world’s largest urban bat colony take to the skies for their nightly flight."
-    }, {
-        lon: -97.744783,
-        lat: 30.262709,
-        name: "ATX Television Festival",
-        type: "pitch"
-    }, {
-        lon: -97.772859,
-        lat: 30.266962,
-        name: "Austin City Limits Music Festival",
-        type: "pitch"
-    } ];
+    return {
+        "JW Marriott Austin": {
+            lon: -97.744044,
+            lat: 30.264294,
+            type: "lodging",
+            copy: "This 1,012-room convention-style hotel will be located on Congress Avenue between 2nd and 3rd Streets. Located just two blocks from the Austin Convention Center, the high-end hotel includes a full-service “regional” Italian restaurant and a specialty restaurant featuring local, Texas cuisine in addition to a Starbucks and additional hotel bars.",
+            gallery: [ "build/img/hotelimg_1.png", "build/img/hotelimg_2.png", "build/img/hotelimg_3.png" ]
+        },
+        "Hotel Van Zandt": {
+            lon: -97.738831,
+            lat: 30.260244,
+            type: "lodging"
+        },
+        "Westin Austin Downtown": {
+            lon: -97.740751,
+            lat: 30.266462,
+            type: "lodging"
+        },
+        "Bat Fest": {
+            lon: -97.745056,
+            lat: 30.262144,
+            type: "pitch",
+            description: "Celebrate this batty event as the world’s largest urban bat colony take to the skies for their nightly flight."
+        },
+        "ATX Television Festival": {
+            lon: -97.744783,
+            lat: 30.262709,
+            type: "pitch"
+        },
+        "Austin City Limits Music Festival": {
+            lon: -97.772859,
+            lat: 30.266962,
+            type: "pitch"
+        }
+    };
 });
 angular.module("services", []).service("map", function() {
     var map = L.mapbox.map("map", "samtgarson.m1ngeboo");
@@ -28022,26 +28025,26 @@ angular.module("services", []).service("map", function() {
         var geojson = {
             type: "FeatureCollection",
             features: []
-        };
-        for (var i = 0; i < data.length; i++) {
-            if (data[i].lon === null || data[i].lat === null) continue;
+        }, names = Object.keys(data), cur;
+        for (var i = 0; i < names.length; i++) {
+            cur = data[names[i]];
+            if (cur.lon === null || cur.lat === null) continue;
             geojson.features.push({
                 type: "Feature",
                 geometry: {
                     type: "Point",
-                    coordinates: [ data[i].lon, data[i].lat ]
+                    coordinates: [ cur.lon, cur.lat ]
                 },
                 properties: {
                     "marker-size": "large",
-                    "marker-color": data[i].colour ? data[i].colour : "#1D4C79",
-                    "marker-symbol": data[i].type,
-                    title: data[i].name,
-                    description: data[i].description ? data[i].description : ""
+                    "marker-color": cur.colour ? cur.colour : "#1D4C79",
+                    "marker-symbol": cur.type,
+                    title: names[i],
+                    description: cur.description ? cur.description : ""
                 }
             });
         }
         dataLayer.setGeoJSON(geojson);
-        map.fitBounds(dataLayer.getBounds());
     };
     service.reset = function() {
         service.working = angular.copy(service.orig);
@@ -28081,16 +28084,27 @@ angular.module("states", []).run(function($rootScope, $state) {}).config(functio
     $locationProvider.html5Mode(true);
     function templater(page, child) {
         if (angular.isUndefined(child)) child = page;
-        return "features/" + page + "/_" + child + ".html";
+        return "src/features/" + page + "/_" + child + ".html";
     }
     $stateProvider.state("home", {
         url: "/",
         templateUrl: templater("home"),
         controller: "homeController"
+    }).state("place", {
+        url: "/place/:name",
+        templateUrl: templater("place"),
+        controller: "placeController"
     });
 });
 angular.module("<%= name%>", []).controller("<%= name%>Controller", function($scope) {});
-angular.module("home", []).controller("homeController", function($scope) {});
+angular.module("home", []).controller("homeController", function($scope, map) {
+    map.setView(L.latLng(30.261, -97.744044), 14);
+});
+angular.module("place", []).controller("placeController", function($scope, markers, $stateParams, map) {
+    $scope.title = $stateParams.name;
+    $scope.place = markers.working[$scope.title];
+    map.setView(L.latLng($scope.place.lat, $scope.place.lon), 16);
+});
 angular.module("<%= name%>", []).directive("go<%= bigname%>", function() {
     return {
         restrict: "E",
@@ -28117,13 +28131,14 @@ angular.module("menu-button", []).directive("menuButton", function() {
 });
 angular.module("templates", []).run([ "$templateCache", function($templateCache) {
     $templateCache.put("features/_feature/_feature.html", "");
-    $templateCache.put("features/home/_home.html", "home");
+    $templateCache.put("features/home/_home.html", "");
+    $templateCache.put("features/place/_place.html", '<div class="place-wrapper">\n    <div class="module">\n        <h2>{{title}}</h2>\n        <p>{{place.copy}}</p>\n        <a class="module__link" href="http://google.com" target="_blank">See the website</a>\n    </div>\n    <div class="module" ng-repeat="img in place.gallery" style="background-image: url(\'{{img}}\');"></div>\n</div>');
     $templateCache.put("patterns/_pattern/_pattern.html", "");
     $templateCache.put("patterns/menu-button/_menu-button.html", '<button class="lines-button" ng-click="toggle()" ng-class="{\'closed\': closed}" type="button" role="button" aria-label="Toggle Navigation">\n  <span class="lines"></span>\n</button>');
 } ]);
-angular.module("app", [ "ui.router", "templates", "breakpointApp", "ct.ui.router.extras", "ngAnimate", "ngSanitize", "states", "services", "geo", "home", "menu-button" ]).run(function() {
+angular.module("app", [ "ui.router", "templates", "breakpointApp", "ct.ui.router.extras", "ngAnimate", "ngSanitize", "states", "services", "geo", "home", "place", "menu-button" ]).run(function() {
     L.mapbox.accessToken = "pk.eyJ1Ijoic2FtdGdhcnNvbiIsImEiOiJuaG9HVmhBIn0.mlEpqJgh4q-smi8J2w0wjg";
-}).controller("appController", function($scope, map, markers, $timeout, dataLayer) {
+}).controller("appController", function($scope, map, markers, $timeout, dataLayer, $state) {
     var $this = this;
     map.zoomControl.removeFrom(map);
     map.touchZoom.disable();
@@ -28134,6 +28149,17 @@ angular.module("app", [ "ui.router", "templates", "breakpointApp", "ct.ui.router
     });
     dataLayer.on("mouseout", function(e) {
         e.layer.closePopup();
+    });
+    $scope.state = "home";
+    $scope.$watch(function() {
+        return $state.current.name;
+    }, function(newVal, oldVal) {
+        $scope.state = newVal;
+    });
+    dataLayer.on("click", function(e) {
+        $state.go("place", {
+            name: e.layer.feature.properties.title
+        });
     });
     $scope.$watch(function() {
         return markers.working;

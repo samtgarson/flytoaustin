@@ -12,6 +12,7 @@ angular.module('app', [
 
     // Features
     'home',
+    'place',
     
     // Patterns
     'menu-button'
@@ -22,7 +23,7 @@ angular.module('app', [
         L.mapbox.accessToken = 'pk.eyJ1Ijoic2FtdGdhcnNvbiIsImEiOiJuaG9HVmhBIn0.mlEpqJgh4q-smi8J2w0wjg';
     })
 
-    .controller('appController', function ($scope, map, markers, $timeout, dataLayer) {
+    .controller('appController', function ($scope, map, markers, $timeout, dataLayer, $state) {
         var $this = this;
         
         //Remove zoom control
@@ -38,6 +39,15 @@ angular.module('app', [
         });
         dataLayer.on('mouseout', function(e) {
             e.layer.closePopup();
+        });
+
+        $scope.state = 'home'
+        $scope.$watch(function() {
+            return $state.current.name;
+        }, function(newVal, oldVal) {$scope.state = newVal;});
+
+        dataLayer.on('click', function(e) {
+            $state.go('place', {'name': e.layer.feature.properties.title});
         });
 
         $scope.$watch(function() {

@@ -19,28 +19,28 @@ angular.module('services', [])
 
         service.update = function(data, oldData) {
             if (!data) data = service.working;
-            var geojson = { type: 'FeatureCollection', features: [] };
+            var geojson = { type: 'FeatureCollection', features: [] }, names = Object.keys(data), cur;
             // For each table row, create a marker.
-            for (var i = 0; i < data.length; i++) {
-            // Blank rows shouldn't be included - they're easy to detect and skip.
-                if (data[i].lon === null || data[i].lat === null) continue;
+            for (var i = 0; i < names.length; i++) {
+                cur = data[names[i]];
+                // Blank rows shouldn't be included - they're easy to detect and skip.
+                if (cur.lon === null || cur.lat === null) continue;
                 geojson.features.push({
                     type: 'Feature',
                     geometry: {
                         type: 'Point',
-                        coordinates: [ data[i].lon, data[i].lat]
+                        coordinates: [ cur.lon, cur.lat]
                     },
                     properties: {
                         'marker-size': 'large',
-                        'marker-color': data[i].colour?data[i].colour:'#1D4C79',
-                        'marker-symbol': data[i].type,
-                        'title': data[i].name,
-                        'description': data[i].description?data[i].description:''
+                        'marker-color': cur.colour?cur.colour:'#1D4C79',
+                        'marker-symbol': cur.type,
+                        'title': names[i],
+                        'description': cur.description?cur.description:''
                     }
                 });
             }
             dataLayer.setGeoJSON(geojson);
-            map.fitBounds(dataLayer.getBounds());
         };
 
         

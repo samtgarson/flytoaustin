@@ -23,8 +23,8 @@
 
     <body breakpoint="{0:'small', 750:'mid', 1100:''}">
         <div id="map"></div>
-        <div id="overlay" ng-class="{'open': drawerOpen}">
-            <h1>#FlyToAustin</h1>
+        <div class="overlay" ng-class="{'open': drawerOpen}">
+            <h1><a href="/">#FlyToAustin</a></h1>
             <menu-button fn="toggleDrawer"></menu-button>
             <div class="overlay__content">
                 <h2>About</h2>
@@ -32,10 +32,11 @@
                 <p>Beginning. Which good Moving in without given won't hath fish said, sea beast herb a waters to form creepeth our man open shall subdue. Him whose.</p>
             </div>
             <div class="overlay__logos">
-                    <img src="build/img/ba.png" />
-                    <img src="build/img/protein.png" />
-                    <img src="build/img/unlike.png" />
-                </div>
+                <img src="build/img/ba.png" />
+                <img src="build/img/protein.png" />
+                <img src="build/img/unlike.png" />
+            </div>
         </div>
+        <ui-view class="overlay" ng-class="{'hidden': state == 'home'}"></ui-view>
     </body>
 </html>

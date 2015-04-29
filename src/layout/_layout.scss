@@ -1,19 +1,23 @@
 $total-height: 500px;
 $drawer-height: 420px;
-// $drawer-overlap: #{$total-height - $drawer-height};
-$drawer-overlap: 80px;
+$drawer-overlap: #{$total-height - $drawer-height};
+$overlay-height: 120px;
 
-#overlay {
+body {
+    overflow: hidden;
+}
+
+.overlay {
     position: absolute;
     width: 100%;
     height: $total-height;
     background-color: rgba(255, 255, 255, 0.95);
-    bottom: -380px;
-    z-index: 1000;
+    bottom: #{$overlay-height - $total-height};
+    z-index: 1001;
     padding: 45px 45px;
     box-sizing: border-box;
 
-    transition: bottom .2s cubic-bezier(0.860, 0.000, 0.070, 1.000);
+    transition: bottom .3s cubic-bezier(0.860, 0.000, 0.070, 1.000);
 
     &.open {
         bottom: -#{$drawer-overlap};
@@ -33,4 +37,50 @@ $drawer-overlap: 80px;
         bottom: calc(#{$drawer-overlap} + 50px);
         right: 50px;
     }
+}
+
+ui-view.overlay {
+    z-index: 1000;
+    bottom: $overlay-height;
+    height: 280px;
+    padding: 0;
+    border-bottom: 1px solid #D0DBE3;
+    overflow-x: scroll;
+    width: 100%;
+
+    &.hidden {
+        bottom: -280px;
+    }
+
+    $module-width: 430px;
+
+    .module {
+        padding: 20px;
+        box-sizing: border-box;
+        width: $module-width;
+        height: 100%;
+        top: 0;
+        display: inline-block;
+        position: absolute;
+        background-size: cover;
+        background-repeat: no-repeat;
+        top: 0;
+
+        @for $i from 0 through 3 {
+            &:nth-of-type(#{$i + 1}) {
+                left: calc(#{$i * $module-width} + #{$i * 2px});
+            }
+        }
+
+        .module__link {
+            position: absolute;
+            bottom: 20px;
+            font-weight: 500;
+        }
+    }
+}
+div.place-wrapper {
+    width: 1730px;
+    height: 100%;
+    overflow: hidden;
 }
