@@ -13,6 +13,7 @@ angular.module('app', [
     // Features
     'home',
     'place',
+    'filter',
     
     // Patterns
     'menu-button'

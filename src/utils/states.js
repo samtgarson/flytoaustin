@@ -48,5 +48,10 @@ angular.module('states', [])
                 'url'               : '/place/:name',
                 'templateUrl': templater('place'), 
                 'controller': 'placeController'
+            })
+            .state('filter', {
+                'url'               : '/filter/:type',
+                'templateUrl': templater('filter'), 
+                'controller': 'filterController'
             });
     });

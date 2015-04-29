@@ -10,7 +10,8 @@ angular.module('geo', [])
                 'build/img/hotelimg_1.png',
                 'build/img/hotelimg_2.png',
                 'build/img/hotelimg_3.png'
-            ]
+            ], leadImage: 'build/img/hotelimg_2.png',
+            url: 'http://www.jwmarriottaustin.com/'
         }, 'Hotel Van Zandt': {
             lon: -97.738831,
             lat: 30.260244,

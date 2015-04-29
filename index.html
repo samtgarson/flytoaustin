@@ -25,6 +25,11 @@
         <div id="map"></div>
         <div class="overlay" ng-class="{'open': drawerOpen}">
             <h1><a href="/">#FlyToAustin</a></h1>
+            <ul class="nav">
+                <li><a ui-sref="filter({type: 'hotel'})" ui-sref-active="active" ng-class="{'inactive': state=='filter'}">Hotels</a></li>
+                <li><a ui-sref="filter({type: 'restaurant'})" ui-sref-active="active" ng-class="{'inactive': state=='filter'}">Restaurants</a></li>
+                <li><a ui-sref="filter({type: 'event'})" ui-sref-active="active" ng-class="{'inactive': state=='filter'}">Events</a></li>
+            </ul>
             <menu-button fn="toggleDrawer"></menu-button>
             <div class="overlay__content">
                 <h2>About</h2>

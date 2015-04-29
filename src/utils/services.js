@@ -7,6 +7,16 @@ angular.module('services', [])
         var dataLayer = L.mapbox.featureLayer().addTo(map);
         return dataLayer;
     })
+    .service('mapResolve', function(dataLayer, $q) {
+        var isReady = $q.defer();
+        // isReady.resolve(true);
+        dataLayer.on('ready', function() {
+            console.log('dataReady!');
+            isReady.resolve(true);
+        });
+
+        return isReady.promise;
+    })
     .service ('markers', function (map, dataLayer, geodata) {
 
         var service = {};
@@ -50,13 +60,29 @@ angular.module('services', [])
         };
 
         service.filter = function(type) {
-            var temp = angular.copy(service.working);
-            for (var i=0, counter=1; i<temp.length; i++) {
-                if (temp[i].type == type) {
-                    temp[i].type = counter.toString();
+            service.reset();
+            var temp = angular.copy(service.working),
+                names = Object.keys(temp), cur;
+            for (var i=0, counter=1; i<names.length; i++) {
+                cur = temp[names[i]];
+                if (cur.type == type) {
+                    cur.type = counter.toString();
                     counter ++;
                 } else {
-                    temp[i].colour = "#fff";
+                    cur.colour = "#fff";
+                }
+            }
+            service.working = temp;
+        };
+
+        service.cherrypick = function(name) {
+            service.reset();
+            var temp = angular.copy(service.working),
+                names = Object.keys(temp), cur;
+            for (var i=0, counter=1; i<names.length; i++) {
+                cur = temp[names[i]];
+                if (names[i] != name) {
+                    cur.colour = "#fff";
                 }
             }
             service.working = temp;

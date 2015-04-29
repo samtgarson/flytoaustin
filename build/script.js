@@ -27980,7 +27980,9 @@ angular.module("geo", []).service("geodata", function() {
             lat: 30.264294,
             type: "lodging",
             copy: "This 1,012-room convention-style hotel will be located on Congress Avenue between 2nd and 3rd Streets. Located just two blocks from the Austin Convention Center, the high-end hotel includes a full-service “regional” Italian restaurant and a specialty restaurant featuring local, Texas cuisine in addition to a Starbucks and additional hotel bars.",
-            gallery: [ "build/img/hotelimg_1.png", "build/img/hotelimg_2.png", "build/img/hotelimg_3.png" ]
+            gallery: [ "build/img/hotelimg_1.png", "build/img/hotelimg_2.png", "build/img/hotelimg_3.png" ],
+            leadImage: "build/img/hotelimg_2.png",
+            url: "http://www.jwmarriottaustin.com/"
         },
         "Hotel Van Zandt": {
             lon: -97.738831,
@@ -28016,6 +28018,13 @@ angular.module("services", []).service("map", function() {
 }).service("dataLayer", function(map) {
     var dataLayer = L.mapbox.featureLayer().addTo(map);
     return dataLayer;
+}).service("mapResolve", function(dataLayer, $q) {
+    var isReady = $q.defer();
+    dataLayer.on("ready", function() {
+        console.log("dataReady!");
+        isReady.resolve(true);
+    });
+    return isReady.promise;
 }).service("markers", function(map, dataLayer, geodata) {
     var service = {};
     service.orig = geodata;
@@ -28050,13 +28059,26 @@ angular.module("services", []).service("map", function() {
         service.working = angular.copy(service.orig);
     };
     service.filter = function(type) {
-        var temp = angular.copy(service.working);
-        for (var i = 0, counter = 1; i < temp.length; i++) {
-            if (temp[i].type == type) {
-                temp[i].type = counter.toString();
+        service.reset();
+        var temp = angular.copy(service.working), names = Object.keys(temp), cur;
+        for (var i = 0, counter = 1; i < names.length; i++) {
+            cur = temp[names[i]];
+            if (cur.type == type) {
+                cur.type = counter.toString();
                 counter++;
             } else {
-                temp[i].colour = "#fff";
+                cur.colour = "#fff";
+            }
+        }
+        service.working = temp;
+    };
+    service.cherrypick = function(name) {
+        service.reset();
+        var temp = angular.copy(service.working), names = Object.keys(temp), cur;
+        for (var i = 0, counter = 1; i < names.length; i++) {
+            cur = temp[names[i]];
+            if (names[i] != name) {
+                cur.colour = "#fff";
             }
         }
         service.working = temp;
@@ -28094,16 +28116,51 @@ angular.module("states", []).run(function($rootScope, $state) {}).config(functio
         url: "/place/:name",
         templateUrl: templater("place"),
         controller: "placeController"
+    }).state("filter", {
+        url: "/filter/:type",
+        templateUrl: templater("filter"),
+        controller: "filterController"
     });
 });
 angular.module("<%= name%>", []).controller("<%= name%>Controller", function($scope) {});
 angular.module("home", []).controller("homeController", function($scope, map) {
     map.setView(L.latLng(30.261, -97.744044), 14);
 });
-angular.module("place", []).controller("placeController", function($scope, markers, $stateParams, map) {
+angular.module("filter", []).controller("filterController", function($scope, map, markers, $stateParams, dataLayer) {
+    map.fitBounds(dataLayer.getBounds());
+    var type = {
+        hotel: "lodging",
+        restaurant: "restaurant",
+        event: "pitch"
+    }[$stateParams.type];
+    markers.filter(type);
+    $scope.list = [];
+    var names = Object.keys(markers.working);
+    for (var cur, i = 0; i < names.length; i++) {
+        cur = markers.orig[names[i]];
+        if (cur.type == type) {
+            cur.title = names[i];
+            cur.number = parseInt(markers.working[names[i]].type);
+            $scope.list.push(cur);
+        }
+    }
+    $scope.$on("$stateChangeStart", markers.reset);
+});
+angular.module("place", []).controller("placeController", function($scope, markers, $stateParams, map, dataLayer, $timeout) {
     $scope.title = $stateParams.name;
+    markers.cherrypick($scope.title);
     $scope.place = markers.working[$scope.title];
+    $timeout(function() {
+        var all = dataLayer._layers;
+        for (var i in all) {
+            if (all[i].options.title == $scope.title) {
+                all[i].openPopup();
+                break;
+            }
+        }
+    }, 200);
     map.setView(L.latLng($scope.place.lat, $scope.place.lon), 16);
+    $scope.$on("$stateChangeStart", markers.reset);
 });
 angular.module("<%= name%>", []).directive("go<%= bigname%>", function() {
     return {
@@ -28132,11 +28189,12 @@ angular.module("menu-button", []).directive("menuButton", function() {
 angular.module("templates", []).run([ "$templateCache", function($templateCache) {
     $templateCache.put("features/_feature/_feature.html", "");
     $templateCache.put("features/home/_home.html", "");
-    $templateCache.put("features/place/_place.html", '<div class="place-wrapper">\n    <div class="module">\n        <h2>{{title}}</h2>\n        <p>{{place.copy}}</p>\n        <a class="module__link" href="http://google.com" target="_blank">See the website</a>\n    </div>\n    <div class="module" ng-repeat="img in place.gallery" style="background-image: url(\'{{img}}\');"></div>\n</div>');
+    $templateCache.put("features/place/_place.html", '<div class="place-wrapper">\n    <div class="module">\n        <h2>{{title}}</h2>\n        <p>{{place.copy}}</p>\n        <a ng-if="place.url" class="module__link" ng-href="{{place.url}" target="_blank">See the website</a>\n    </div>\n    <div class="module" ng-repeat="img in place.gallery" style="background-image: url(\'{{img}}\');"></div>\n</div>');
+    $templateCache.put("features/filter/_filter.html", '<div class="filter-wrapper"> \n    <a class="module" ng-repeat="place in list" ui-sref="place({name: \'{{place.title}}\'})" style="background-image: url(\'{{place.leadImage}}\');">\n        <h2><span>{{place.number}}</span>{{place.title}}</h2>\n    </a>\n</div>');
     $templateCache.put("patterns/_pattern/_pattern.html", "");
     $templateCache.put("patterns/menu-button/_menu-button.html", '<button class="lines-button" ng-click="toggle()" ng-class="{\'closed\': closed}" type="button" role="button" aria-label="Toggle Navigation">\n  <span class="lines"></span>\n</button>');
 } ]);
-angular.module("app", [ "ui.router", "templates", "breakpointApp", "ct.ui.router.extras", "ngAnimate", "ngSanitize", "states", "services", "geo", "home", "place", "menu-button" ]).run(function() {
+angular.module("app", [ "ui.router", "templates", "breakpointApp", "ct.ui.router.extras", "ngAnimate", "ngSanitize", "states", "services", "geo", "home", "place", "filter", "menu-button" ]).run(function() {
     L.mapbox.accessToken = "pk.eyJ1Ijoic2FtdGdhcnNvbiIsImEiOiJuaG9HVmhBIn0.mlEpqJgh4q-smi8J2w0wjg";
 }).controller("appController", function($scope, map, markers, $timeout, dataLayer, $state) {
     var $this = this;
