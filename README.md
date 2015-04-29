@@ -1,4 +1,4 @@
-Boilerplate v2.0
+BA Microsite
 ==========
 
-Angular Starter Pack
+Microsite for British Airways to encourage flights to Austin, Texas.
