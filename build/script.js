@@ -27978,37 +27978,32 @@ angular.module("geo", []).service("geodata", function() {
         lon: -97.744044,
         lat: 30.264294,
         name: "JW Marriott Austin",
-        colour: "#000",
         type: "lodging"
     }, {
         lon: -97.738831,
         lat: 30.260244,
         name: "Hotel Van Zandt",
-        colour: "#000",
         type: "lodging"
     }, {
         lon: -97.740751,
         lat: 30.266462,
         name: "Westin Austin Downtown",
-        colour: "#000",
         type: "lodging"
     }, {
         lon: -97.745056,
         lat: 30.262144,
         name: "Bat Fest",
-        colour: "#000",
-        type: "pitch"
+        type: "pitch",
+        description: "Celebrate this batty event as the world’s largest urban bat colony take to the skies for their nightly flight."
     }, {
         lon: -97.744783,
         lat: 30.262709,
         name: "ATX Television Festival",
-        colour: "#000",
         type: "pitch"
     }, {
         lon: -97.772859,
         lat: 30.266962,
         name: "Austin City Limits Music Festival",
-        colour: "#000",
         type: "pitch"
     } ];
 });
@@ -28037,10 +28032,11 @@ angular.module("services", []).service("map", function() {
                     coordinates: [ data[i].lon, data[i].lat ]
                 },
                 properties: {
-                    "marker-size": "medium",
-                    "marker-color": data[i].colour,
+                    "marker-size": "large",
+                    "marker-color": data[i].colour ? data[i].colour : "#1D4C79",
                     "marker-symbol": data[i].type,
-                    title: data[i].name
+                    title: data[i].name,
+                    description: data[i].description ? data[i].description : ""
                 }
             });
         }
@@ -28103,21 +28099,48 @@ angular.module("<%= name%>", []).directive("go<%= bigname%>", function() {
         templateUrl: "patterns/<%= name%>/_<%= name%>.html"
     };
 }).controller("<%= name%>Controller", function($scope, $element) {});
+angular.module("menu-button", []).directive("menuButton", function() {
+    return {
+        restrict: "E",
+        scope: {
+            fn: "="
+        },
+        controller: "menuButtonController",
+        templateUrl: "patterns/menu-button/_menu-button.html"
+    };
+}).controller("menuButtonController", function($scope, $element) {
+    $scope.closed = false;
+    $scope.toggle = function() {
+        $scope.closed = !$scope.closed;
+        $scope.fn();
+    };
+});
 angular.module("templates", []).run([ "$templateCache", function($templateCache) {
     $templateCache.put("features/_feature/_feature.html", "");
     $templateCache.put("features/home/_home.html", "home");
     $templateCache.put("patterns/_pattern/_pattern.html", "");
+    $templateCache.put("patterns/menu-button/_menu-button.html", '<button class="lines-button" ng-click="toggle()" ng-class="{\'closed\': closed}" type="button" role="button" aria-label="Toggle Navigation">\n  <span class="lines"></span>\n</button>');
 } ]);
-angular.module("app", [ "ui.router", "templates", "breakpointApp", "ct.ui.router.extras", "ngAnimate", "ngSanitize", "states", "services", "geo", "home" ]).run(function() {
+angular.module("app", [ "ui.router", "templates", "breakpointApp", "ct.ui.router.extras", "ngAnimate", "ngSanitize", "states", "services", "geo", "home", "menu-button" ]).run(function() {
     L.mapbox.accessToken = "pk.eyJ1Ijoic2FtdGdhcnNvbiIsImEiOiJuaG9HVmhBIn0.mlEpqJgh4q-smi8J2w0wjg";
-}).controller("appController", function($scope, map, markers, $timeout) {
+}).controller("appController", function($scope, map, markers, $timeout, dataLayer) {
     var $this = this;
     map.zoomControl.removeFrom(map);
     map.touchZoom.disable();
     map.doubleClickZoom.disable();
     map.scrollWheelZoom.disable();
+    dataLayer.on("mouseover", function(e) {
+        e.layer.openPopup();
+    });
+    dataLayer.on("mouseout", function(e) {
+        e.layer.closePopup();
+    });
     $scope.$watch(function() {
         return markers.working;
     }, markers.update);
     markers.update();
+    $scope.drawerOpen = false;
+    $scope.toggleDrawer = function() {
+        $scope.drawerOpen = !$scope.drawerOpen;
+    };
 });

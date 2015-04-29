@@ -11,9 +11,10 @@ angular.module('app', [
     'geo',
 
     // Features
-    'home'
+    'home',
     
     // Patterns
+    'menu-button'
 ])
 
     .run(function() {
@@ -21,7 +22,7 @@ angular.module('app', [
         L.mapbox.accessToken = 'pk.eyJ1Ijoic2FtdGdhcnNvbiIsImEiOiJuaG9HVmhBIn0.mlEpqJgh4q-smi8J2w0wjg';
     })
 
-    .controller('appController', function ($scope, map, markers, $timeout) {
+    .controller('appController', function ($scope, map, markers, $timeout, dataLayer) {
         var $this = this;
         
         //Remove zoom control
@@ -32,11 +33,23 @@ angular.module('app', [
         map.doubleClickZoom.disable();
         map.scrollWheelZoom.disable();
 
+        dataLayer.on('mouseover', function(e) {
+            e.layer.openPopup();
+        });
+        dataLayer.on('mouseout', function(e) {
+            e.layer.closePopup();
+        });
+
         $scope.$watch(function() {
             return markers.working;
         }, markers.update);
 
         markers.update();
+
+        $scope.drawerOpen = false;
+        $scope.toggleDrawer = function () {
+            $scope.drawerOpen = !$scope.drawerOpen;
+        }
 
     });
 

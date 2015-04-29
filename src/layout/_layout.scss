@@ -1,8 +1,36 @@
+$total-height: 500px;
+$drawer-height: 420px;
+// $drawer-overlap: #{$total-height - $drawer-height};
+$drawer-overlap: 80px;
+
 #overlay {
     position: absolute;
     width: 100%;
-    height: 500px;
+    height: $total-height;
     background-color: rgba(255, 255, 255, 0.95);
     bottom: -380px;
     z-index: 1000;
+    padding: 45px 45px;
+    box-sizing: border-box;
+
+    transition: bottom .2s cubic-bezier(0.860, 0.000, 0.070, 1.000);
+
+    &.open {
+        bottom: -#{$drawer-overlap};
+    }
+
+    .overlay__content {
+        bottom: calc(#{$drawer-overlap} + 50px);
+        position: absolute;
+        width: 100%;
+
+        p {
+            width: 30%;
+        }
+    }
+    .overlay__logos {
+        position: absolute;
+        bottom: calc(#{$drawer-overlap} + 50px);
+        right: 50px;
+    }
 }

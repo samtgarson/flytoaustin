@@ -31,10 +31,11 @@ angular.module('services', [])
                         coordinates: [ data[i].lon, data[i].lat]
                     },
                     properties: {
-                        'marker-size': 'medium',
-                        'marker-color': data[i].colour,
+                        'marker-size': 'large',
+                        'marker-color': data[i].colour?data[i].colour:'#1D4C79',
                         'marker-symbol': data[i].type,
-                        'title': data[i].name
+                        'title': data[i].name,
+                        'description': data[i].description?data[i].description:''
                     }
                 });
             }

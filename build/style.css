@@ -1621,9 +1621,9 @@
     opacity: 1; }
 
 h1, .h1 {
-  font-size: 300%;
-  letter-spacing: -2px;
-  font-weight: 100;
+  margin: 0;
+  font-size: 220%;
+  font-weight: 600;
   line-height: 1.2em;
   display: inline-block; }
 
@@ -1633,14 +1633,14 @@ h1, .h1 {
   letter-spacing: -1px; }
 
 h2, .h2 {
-  font-size: 250%;
-  letter-spacing: -1px;
-  font-weight: 100;
+  font-size: 160%;
+  font-weight: 500;
   line-height: 1.2em;
-  display: inline-block; }
+  display: inline-block;
+  margin: 0.4em 0; }
 
 h3, .h3 {
-  font-size: 200%;
+  font-size: 120%;
   font-weight: 100;
   line-height: calc(200% * 1.2);
   display: inline-block; }
@@ -1659,7 +1659,9 @@ h5, .h5 {
 
 body {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  color: #1D4C79; }
+  color: #1D4C79;
+  font-size: 15px;
+  line-height: 1.4em; }
 
 #overlay {
   position: absolute;
@@ -1667,7 +1669,79 @@ body {
   height: 500px;
   background-color: rgba(255, 255, 255, 0.95);
   bottom: -380px;
-  z-index: 1000; }
+  z-index: 1000;
+  padding: 45px 45px;
+  box-sizing: border-box;
+  transition: bottom 0.2s cubic-bezier(0.86, 0, 0.07, 1); }
+  #overlay.open {
+    bottom: -80px; }
+  #overlay .overlay__content {
+    bottom: calc(80px + 50px);
+    position: absolute;
+    width: 100%; }
+    #overlay .overlay__content p {
+      width: 30%; }
+  #overlay .overlay__logos {
+    position: absolute;
+    bottom: calc(80px + 50px);
+    right: 50px; }
+
+.lines-button {
+  display: inline-block;
+  transition: 0.3s;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  border: 0;
+  outline: 0;
+  background: 0;
+  float: right; }
+  .lines-button:hover {
+    opacity: 1; }
+  .lines-button:active {
+    transition: 0; }
+
+.lines {
+  display: inline-block;
+  width: 1.8rem;
+  height: 0.25714rem;
+  background: #1D4C79;
+  transition: 0.3s;
+  position: relative;
+  /*create the upper and lower lines as pseudo-elements of the middle line*/ }
+  .lines:before, .lines:after {
+    display: inline-block;
+    width: 1.8rem;
+    height: 0.25714rem;
+    background: #1D4C79;
+    transition: 0.3s;
+    position: absolute;
+    left: 0;
+    content: '';
+    -webkit-transform-origin: 0.12857rem center;
+    transform-origin: 0.12857rem center; }
+  .lines:before {
+    top: 0.51429rem; }
+  .lines:after {
+    top: -0.51429rem; }
+
+.lines-button.closed .lines {
+  /*hide the middle line*/
+  background: transparent;
+  /*overlay the lines by setting both their top values to 0*/ }
+  .lines-button.closed .lines:before, .lines-button.closed .lines:after {
+    -webkit-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    top: 0;
+    width: 1.8rem; }
+  .lines-button.closed .lines:before {
+    -webkit-transform: rotate3d(0, 0, 1, 45deg);
+    transform: rotate3d(0, 0, 1, 45deg); }
+  .lines-button.closed .lines:after {
+    -webkit-transform: rotate3d(0, 0, 1, -45deg);
+    transform: rotate3d(0, 0, 1, -45deg); }
 
 input, textarea, button, select, a {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
@@ -1689,3 +1763,6 @@ input, textarea, button, select, a {
   top: 0;
   bottom: 0;
   width: 100%; }
+
+.leaflet-layer {
+  opacity: 0.9; }
