@@ -11,7 +11,7 @@ var gulp            = require('gulp'),
 // Define main 
 var jsexp = new RegExp(/^.*\.js$/);
 var cssexp = new RegExp(/^.*\.css$/);
-var jsFiles = mainBowerFiles({filter: jsexp}).concat(['src/*/**/*.js', 'src/templates.js', 'src/app.js']);
+var jsFiles = mainBowerFiles({filter: jsexp}).concat(['src/templates.js', 'src/*/**/*.js', 'src/app.js']);
 var cssFiles = mainBowerFiles({filter: cssexp}).concat(['src/**/*.scss']);
 
 gulp.task('print', function() {
