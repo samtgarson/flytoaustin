@@ -1,4 +1,6 @@
-BA Microsite
+Fly To Austin
 ==========
 
-Microsite for British Airways to encourage flights to Austin, Texas.
+Prototype microsite for British Airways to encourage flights to Austin, Texas.
+
+See at [samtgarson.github.io/flytoaustin](samtgarson.github.io/flytoaustin)
