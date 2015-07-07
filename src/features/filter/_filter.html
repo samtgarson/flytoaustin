@@ -1,0 +1,5 @@
+<div class="filter-wrapper"> 
+    <a class="module" ng-repeat="place in list" ui-sref="place({name: '{{place.title}}'})" style="background-image: url('{{place.leadImage}}');">
+        <h2><span>{{place.number}}</span>{{place.title}}</h2>
+    </a>
+</div>

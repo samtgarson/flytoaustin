@@ -1,0 +1,8 @@
+<div class="place-wrapper">
+    <div class="module">
+        <h2>{{title}}</h2>
+        <p>{{place.copy}}</p>
+        <a ng-if="place.url" class="module__link" ng-href="{{place.url}" target="_blank">See the website</a>
+    </div>
+    <div class="module" ng-repeat="img in place.gallery" style="background-image: url('{{img}}');"></div>
+</div>
